@@ -1,0 +1,104 @@
+import React, { useState } from "react";
+
+function App() {
+  const [files, setFiles] = useState([]);
+
+  // Upload files
+  const handleUpload = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+
+    const newFiles = selectedFiles.map((file) => ({
+      id: Date.now() + file.name,
+      name: file.name,
+      size: (file.size / 1024).toFixed(2) + " KB",
+      type: file.type || "Unknown",
+      preview: file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : null,
+    }));
+
+    setFiles((prev) => [...prev, ...newFiles]);
+  };
+
+  // Delete file
+  const handleDelete = (id) => {
+    setFiles(files.filter((file) => file.id !== id));
+  };
+
+  return (
+    <div style={styles.container}>
+      <h1>📁 File Vault UI</h1>
+
+      <input type="file" multiple onChange={handleUpload} />
+
+      <div style={styles.list}>
+        {files.length === 0 && <p>No files uploaded</p>}
+
+        {files.map((file) => (
+          <div key={file.id} style={styles.card}>
+            {file.preview && (
+              <img src={file.preview} alt="preview" style={styles.image} />
+            )}
+
+            <div style={styles.info}>
+              <p><b>Name:</b> {file.name}</p>
+              <p><b>Size:</b> {file.size}</p>
+              <p><b>Type:</b> {file.type}</p>
+            </div>
+
+            <button
+              style={styles.button}
+              onClick={() => handleDelete(file.id)}
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const styles = {
+  container: {
+    maxWidth: "800px",
+    margin: "auto",
+    textAlign: "center",
+    padding: "20px",
+    fontFamily: "Arial",
+  },
+  list: {
+    marginTop: "20px",
+  },
+  card: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    background: "#fff",
+    padding: "10px",
+    margin: "10px 0",
+    borderRadius: "8px",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+  },
+  info: {
+    flex: 1,
+    textAlign: "left",
+    marginLeft: "10px",
+  },
+  image: {
+    width: "60px",
+    height: "60px",
+    objectFit: "cover",
+    borderRadius: "6px",
+  },
+  button: {
+    background: "red",
+    color: "#fff",
+    border: "none",
+    padding: "6px 12px",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
+};
+
+export default App;
